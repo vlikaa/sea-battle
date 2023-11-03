@@ -5,6 +5,11 @@ using namespace std;
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    
+	while (true)
+	{
+		cout << " HI";
+	}
+
 }
 
