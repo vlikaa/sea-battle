@@ -46,14 +46,25 @@ void mainInstruction(short array[][10], const short length) {
 		switch (_getch())
 		{
 		case arrowUp:
-
+			if (x > 0) {
+				swap(array[x][y], array[x - 1][y]);
+				x--;
+			}
 			break;
 		case arrowDown:
+			if (x < length - 1) {
+				swap(array[x][y], array[x + 1][y]);
+				x++;
+			}
 			break;
 		case arrowLeft:
+			if (y > 0) {
+				swap(array[x][y], array[x][y - 1]);
+				y--;
+			}
 			break;
 		case arrowRight:
-			if ((y != length - 1) || (x != length - 1)) {
+			if (y < length - 1) {
 				swap(array[x][y], array[x][y + 1]);
 				y++;
 			}
