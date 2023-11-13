@@ -548,7 +548,7 @@ short checkNear(short array[][10], const short shipSize, const bool turned, shor
 				nearLength = 6;
 				center = 2;
 				for (short i = 0, j = 0, step = 1; step <= nearLength; step++) {
-					if (step != center && array[x + i][y - 1 + j] == 1) {
+					if (step != center && array[x + (shipSize - 1) + i][y - 1 + j] == 1) {
 						return 1;
 					}
 					if (step % 3 == 0) {
@@ -558,9 +558,14 @@ short checkNear(short array[][10], const short shipSize, const bool turned, shor
 					j++;
 				}
 			}
-			//else {
-
-			//}
+			else {
+				if (array[x + i][y - 1] == 1) {
+					return 1;
+				}
+				else if (array[x + i][y + 1] == 1) {
+					return 1;
+				}
+			}
 		}
 	}
 
