@@ -6,6 +6,13 @@
 
 using namespace std;
 
+enum Frame : char
+{
+	boldTopHorizontal = char(223),
+	boldBottomHorizontal = char(220),
+	boldVertical = char(219)
+};
+
 enum ships
 {
 	singleDeck = 49,
@@ -130,12 +137,42 @@ void paint(const int bgcolor, const int color) {
 
 void printGameBox(const short array[][10], const short length) {
 	cout << endl;
-	for (int i = 0; i < length; i++) {
-		for (int j = 0; j < length; j++) {
-			cout << setw(4) << array[i][j];
-		}
-		cout << "\n\n";
+	cout << boldVertical;
+	for (short i = 0; i < length * 4; i++) {
+		cout << boldTopHorizontal;
 	}
+	cout << boldVertical << endl;
+	for (int i = 0; i < length; i++) {
+		cout << boldVertical;
+		for (int j = 0; j < length; j++) {
+			if (array[i][j] > 1)
+				paint(black, red);
+			else
+				paint(black, white);
+
+			if (array[i][j] == 0)
+				cout << "    ";
+			
+			else if (array[i][j] == 1)
+				cout << " H  ";
+
+			else if (array[i][j] > 1)
+				cout << " H  ";
+			
+
+		}
+		cout << boldVertical << endl << boldVertical;
+		if (i == 9) {
+			for (short i = 0; i < length * 4; i++) {
+				cout << boldBottomHorizontal;
+			}
+			cout << boldVertical << endl;
+		}
+		else
+			cout << setw(41) << boldVertical << endl;
+
+	}
+
 }
 
 void mainInstruction(short array[][10], const short length) {
@@ -164,13 +201,17 @@ void shipMove(short array[][10], const short length, const short shipSize, short
 
 	while (true) {
 
-		checkCollision = checkNear(array, shipSize, turned, x, y);
+		if (array[x][y] == 2 || !flag)
+			checkCollision = 0;
+		else
+			checkCollision = checkNear(array, shipSize, turned, x, y);
+
 		if (checkCollision) {
 			for (short i = 0; i < shipSize; i++) {
 				if (turned)
-					array[x + i][y] = 2;
+					array[x + i][y] = 3;
 				else
-					array[x][y + i] = 2;
+					array[x][y + i] = 3;
 			} 
 		}
 		else if (!checkCollision && flag){
@@ -188,10 +229,30 @@ void shipMove(short array[][10], const short length, const short shipSize, short
 		if (key == enter)
 			return;
 
-		else if (key == 82 || key == 114) {
+		else if (key == 82 || key == 114 || key == 138 || key == 170) {
 			if (y + shipSize - 1 < length && x + shipSize - 1 < length && shipSize > 1) {
 				for (short i = 1; i < shipSize; i++) {
-					if (array[x][y + i] == 2 && !turned) {
+					if (array[x][y + i] == 3 && !turned) {
+						if (array[x + i][y] == 1) {
+							array[x][y + i] = 0;
+							array[x + i][y] = 2;
+							flag = false;
+						}
+						else {
+							swap(array[x][y + i], array[x + i][y]);
+						}
+					}
+					else if (array[x][y + i] == 3 && turned) {
+						if (array[x][y + i] == 1) {
+							array[x + i][y] = 0;
+							array[x][y + i] = 2;
+							flag = false;
+						}
+						else {
+							swap(array[x][y + i], array[x + i][y]);
+						}
+					}
+					else if (array[x][y + i] == 2 && !turned) {
 						if (array[x + i][y] == 1) {
 							array[x][y + i] = 1;
 							array[x + i][y] = 2;
@@ -247,17 +308,14 @@ void shipMove(short array[][10], const short length, const short shipSize, short
 			if (x > 0) {
 				for (short i = 0; i < shipSize; i++) {
 					if (turned) {
-						if (checkCollision) {
+						if (array[x + i][y] == 3) {
 							if (array[x + i - 1][y] == 1) {
-								array[x + i][y] = temp;
-								temp = array[x + i - 1][y];
+								array[x + i][y] = 0;
 								array[x + i - 1][y] = 2;
 								flag = false;
 							}
-							else {
-								swap(array[x][y + i], temp);
-								temp = array[x - 1][y + i];
-							}
+							else 
+								swap(array[x + i][y], array[x - 1 + i][y]);
 						}
 						else if (array[x + i][y] == 2) {
 							if (array[x + i - 1][y] == 1) {
@@ -277,17 +335,14 @@ void shipMove(short array[][10], const short length, const short shipSize, short
 							swap(array[x + i][y], array[x + i - 1][y]);
 					}
 					else {
-						if (checkCollision) {
+						if (array[x + i][y] == 3) {
 							if (array[x - 1][y + i] == 1) {
-								array[x][y + i] = temp;
-								temp = array[x - 1][y + i];
+								array[x][y + i] = 0;
 								array[x - 1][y + i] = 2;
 								flag = false;
 							}
-							else {
-								swap(array[x][y + i], temp);
-								temp = array[x - 1][y + i];
-							}
+							else
+								swap(array[x][y + i], array[x - 1][y + i]);
 						}
 						else if (array[x][y + i] == 2) {
 							if (array[x - 1][y + i] == 1) {
@@ -313,7 +368,16 @@ void shipMove(short array[][10], const short length, const short shipSize, short
 		case arrowDown:
 			if (x + shipSize - 1 < length - 1 && turned) {
 				for (short i = 0; i < shipSize; i++) {
-					if (array[x + shipSize - (i + 1)][y] == 2 && !checkCollision) {
+					if (array[x + shipSize - (i + 1)][y] == 3) {
+						if (array[x + 1 + shipSize - (i + 1)][y] == 1) {
+							array[x + shipSize - (i + 1)][y] = 0;
+							array[x + 1 + shipSize - (i + 1)][y] = 2;
+							flag = false;
+						}
+						else
+							swap(array[x + shipSize - (i + 1)][y], array[x + 1 + shipSize - (i + 1)][y]);
+					}
+					else if (array[x + shipSize - (i + 1)][y] == 2) {
 						if (array[x + 1 + shipSize - (i + 1)][y] == 1) {
 							array[x + shipSize - (i + 1)][y] = 1;
 							array[x + 1 + shipSize - (i + 1)][y] = 2;
@@ -334,7 +398,16 @@ void shipMove(short array[][10], const short length, const short shipSize, short
 			}
 			else if (x < length - 1 && !turned) {
 				for (short i = 0; i < shipSize; i++) {
-					if (array[x][y + i] == 2 && !checkCollision) {
+					if (array[x][y + i] == 3) {
+						if (array[x + 1][y + i] == 1) {
+							array[x][y + i] = 0;
+							array[x + 1][y + i] = 2;
+							flag = false;
+						}
+						else
+							swap(array[x][y + i], array[x + 1][y + i]);
+					}
+					else if (array[x][y + i] == 2) {
 						if (array[x + 1][y + i] == 1) {
 							array[x][y + i] = 1;
 							array[x + 1][y + i] = 2;
@@ -358,7 +431,16 @@ void shipMove(short array[][10], const short length, const short shipSize, short
 			if (y > 0) {
 				for (short i = 0; i < shipSize; i++) {
 					if (turned) {
-						if (array[x + i][y] == 2 && !checkCollision) {
+						if (array[x + i][y] == 3) {
+							if (array[x + i][y - 1] == 1) {
+								array[x + i][y] = 0;
+								array[x + i][y - 1] = 2;
+								flag = false;
+							}
+							else
+								swap(array[x + i][y], array[x + i][y - 1]);
+						}
+						else if (array[x + i][y] == 2) {
 							if (array[x + i][y - 1] == 1) {
 								array[x + i][y] = 1;
 								array[x + i][y - 1] = 2;
@@ -377,7 +459,16 @@ void shipMove(short array[][10], const short length, const short shipSize, short
 
 					}
 					else {
-						if (array[x][y + i] == 2 && !checkCollision) {
+						if (array[x][y + i] == 3) {
+							if (array[x][y + i - 1] == 1) {
+								array[x][y + i] = 0;
+								array[x][y + i - 1] = 2;
+								flag = false;
+							}
+							else
+								swap(array[x][y + i], array[x][y + i - 1]);
+						}
+						else if (array[x][y + i] == 2) {
 							if (array[x][y + i - 1] == 1) {
 								array[x][y + i] = 1;
 								array[x][y + i - 1] = 2;
@@ -401,7 +492,16 @@ void shipMove(short array[][10], const short length, const short shipSize, short
 		case arrowRight:
 			if (y + shipSize - 1 < length - 1 && !turned) {
  				for (short i = 0; i < shipSize; i++) {
-					if (array[x][y + shipSize - (i + 1)] == 2 && !checkCollision) {
+					if (array[x][y + shipSize - (i + 1)] == 3) {
+						if (array[x][y + 1 + shipSize - (i + 1)] == 1) {
+							array[x][y + shipSize - (i + 1)] = 0;
+							array[x][y + 1 + shipSize - (i + 1)] = 2;
+							flag = false;
+						}
+						else
+							swap(array[x][y + shipSize - (i + 1)], array[x][y + 1 + shipSize - (i + 1)]);
+					}
+					else if (array[x][y + shipSize - (i + 1)] == 2) {
 						if (array[x][y + 1 + shipSize - (i + 1)] == 1) {
 							array[x][y + shipSize - (i + 1)] = 1;
 							array[x][y + 1 + shipSize - (i + 1)] = 2;
@@ -422,7 +522,16 @@ void shipMove(short array[][10], const short length, const short shipSize, short
 			}
 			else if (y < length - 1 && turned) {
 				for (short i = 0; i < shipSize; i++) {
-					if (array[x + i][y] == 2 && !checkCollision) {
+					if (array[x + i][y] == 3) {
+						if (array[x + i][y + 1] == 1) {
+							array[x + i][y] = 0;
+							array[x + i][y + 1] = 2;
+							flag = false;
+						}
+						else
+							swap(array[x + i][y], array[x + i][y + 1]);
+					}
+					else if (array[x + i][y] == 2) {
 						if (array[x + i][y + 1] == 1) {
 							array[x + i][y] = 1;
 							array[x + i][y + 1] = 2;
@@ -567,19 +676,50 @@ short checkNear(short array[][10], const short shipSize, const bool turned, shor
 				}
 			}
 		}
+		return 0;
 	}
 
-	//else {
-	//	if (array[x - 1][y] == 1)
-	//		return 1;
-	//	else if (array[x + 1][y] == 1)
-	//		return 1;
-	//	else if (array[x][y - 1] == 1)
-	//		return 1;
-	//	else if (array[x][y + 1] == 1)
-	//		return 1;
-	//}
-	
-	return 0;
+	else {
+		for (short i = 0; i < shipSize; i++) {
+			if (i == 0) {
+				nearLength = 6;
+				center = 4;
+				for (short i = 0, j = 0, step = 1; step <= nearLength; step++) {
+					if (step != center && array[x - 1 + i][y - 1 + j] == 1) {
+						return 1;
+					}
+					if (step % 2 == 0) {
+						j = -1;
+						i++;
+					}
+					j++;
+				}
+			}
+			else if (i + 1 == shipSize) {
+				nearLength = 6;
+				center = 3;
+				for (short i = 0, j = 0, step = 1; step <= nearLength; step++) {
+					if (step != center && array[x - 1 + i][y + (shipSize - 1) + j] == 1) {
+						return 1;
+					}
+					if (step % 2 == 0) {
+						j = -1;
+						i++;
+					}
+					j++;
+				}
+			}
+			else {
+				if (array[x - 1][y + i] == 1) {
+					return 1;
+				}
+				else if (array[x + 1][y + i] == 1) {
+					return 1;
+				}
+			}
+		}
+		return 0;
+
+	}
 
 }
