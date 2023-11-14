@@ -77,6 +77,8 @@ void randomArrange(short array[][10], const short);
 
 void paint(const int, const int);
 
+void startGame(short array[][10], short enemy[][10], const short);
+
 int main()
 {
 
@@ -224,6 +226,8 @@ void printGameBox(const short array[][10], const short length) {
 void mainInstruction(short array[][10], const short length) {
 	bool flag = true;
 	int select;
+	short enemy[10][10]{};
+
 	while (flag) {
 		select = showMenu();
 		switch (select - 1)
@@ -235,7 +239,8 @@ void mainInstruction(short array[][10], const short length) {
 				randomArrange(array, length);
 			else if (select == 2)
 				playerInstruction(array, length);
-
+			randomArrange(enemy, length);
+			startGame(array, enemy, length);
 			break;
 		case load:
 			break;
@@ -915,4 +920,79 @@ short checkNear(short array[][10], const short shipSize, const bool turned, shor
 
 	}
 
+}
+
+void startGame(short array[][10], short enemy[][10], const short length) {
+	bool flag = true;
+	while (flag) {
+		cout << endl;
+		cout << boldVertical;
+		for (short i = 0; i < length * 4; i++) {
+			cout << boldTopHorizontal;
+		}
+		cout << boldVertical << "\t\t" << boldVertical;
+		for (short i = 0; i < length * 4; i++) {
+			cout << boldTopHorizontal;
+		}
+		cout << boldVertical << endl;
+
+		for (int i = 0; i < length; i++) {
+			cout << boldVertical;
+			for (int j = 0; j < length; j++) {
+				if (array[i][j] > 1)
+					paint(black, red);
+				else
+					paint(black, white);
+
+				if (array[i][j] == 0)
+					cout << "    ";
+
+				else if (array[i][j] == 1)
+					cout << " H  ";
+
+				else if (array[i][j] > 1)
+					cout << " H  ";
+
+
+			}
+			cout << boldVertical << "\t\t" << boldVertical;
+			for (int j = 0; j < length; j++) {
+				if (array[i][j] > 1)
+					paint(black, red);
+				else
+					paint(black, white);
+
+				if (enemy[i][j] == 0)
+					cout << "    ";
+
+				else if (enemy[i][j] == 1)
+					cout << " H  ";
+
+				else if (enemy[i][j] > 1)
+					cout << " H  ";
+
+
+			}
+			cout << boldVertical << endl << boldVertical;
+			if (i == 9) {
+				for (short i = 0; i < length * 4; i++) {
+					cout << boldBottomHorizontal;
+				}
+				cout << boldVertical << "\t\t";
+			}
+			else
+				cout << setw(41) << boldVertical << "\t\t";
+			cout << boldVertical;
+			if (i == 9) {
+				for (short i = 0; i < length * 4; i++) {
+					cout << boldBottomHorizontal;
+				}
+				cout << boldVertical << endl;
+			}
+			else
+				cout << setw(41) << boldVertical << endl;
+
+		}
+	system("pause");
+	}
 }
