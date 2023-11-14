@@ -59,6 +59,8 @@ enum keys
 
 int showMenu();
 
+int showMethodChoise(const short array[][10], const short);
+
 void printGameBox(const short array[][10], const short);
 
 void shipMove(short array[][10], const short, const short, short, short);
@@ -134,6 +136,45 @@ int showMenu() {
 
 }
 
+int showMethodChoise(const short array[][10], const short length) {
+
+	int key = 1;
+	while (true)
+	{
+		system("cls");
+		printGameBox(array, length);
+		if (key == 1) paint(red, white);
+		else paint(black, white);
+		cout << "    automatic  \n";
+
+		if (key == 2) paint(red, white);
+		else paint(black, white);
+		cout << "    manual     \n";
+
+		paint(black, white);
+
+		if (_getch() == 13) {
+			return key;
+		}
+
+		switch (_getch())
+		{
+		case arrowUp:
+			if (key == 1) key = 2;
+			else key--;
+			break;
+		case arrowDown:
+			if (key == 2) key = 1;
+			else key++;
+			break;
+		default:
+			break;
+		}
+
+
+	}
+}
+
 void paint(const int bgcolor, const int color) {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -182,19 +223,19 @@ void printGameBox(const short array[][10], const short length) {
 
 void mainInstruction(short array[][10], const short length) {
 	bool flag = true;
+	int select;
 	while (flag) {
-		int select = showMenu();
+		select = showMenu();
 		switch (select - 1)
 		{
 		case start:
 			system("cls");
-			printGameBox(array, length);
-			cout << "\n\n    Select arrangement method:"
-				<< "\n\t1. automatic"
-				<< "\n\t2. manual";
-			system("pause");
+			select = showMethodChoise(array, length);
+			if (select == 1)
+				randomArrange(array, length);
+			else if (select == 2)
+				playerInstruction(array, length);
 
-			playerInstruction(array, length);
 			break;
 		case load:
 			break;
