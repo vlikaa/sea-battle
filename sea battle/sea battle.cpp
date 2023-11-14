@@ -200,13 +200,13 @@ void printGameBox(const short array[][10], const short length) {
 
 			if (array[i][j] == 0)
 				cout << "    ";
-			
+
 			else if (array[i][j] == 1)
 				cout << " H  ";
 
 			else if (array[i][j] > 1)
 				cout << " H  ";
-			
+
 
 		}
 		cout << boldVertical << endl << boldVertical;
@@ -270,9 +270,9 @@ void shipMove(short array[][10], const short length, const short shipSize, short
 					array[x + i][y] = 3;
 				else
 					array[x][y + i] = 3;
-			} 
+			}
 		}
-		else if (!checkCollision && flag){
+		else if (!checkCollision && flag) {
 			for (short i = 0; i < shipSize; i++) {
 				if (turned)
 					array[x + i][y] = 1;
@@ -348,7 +348,7 @@ void shipMove(short array[][10], const short length, const short shipSize, short
 							swap(array[x][y + i], array[x + i][y]);
 						}
 					}
-					else 
+					else
 						swap(array[x][y + i], array[x + i][y]);
 				}
 				if (turned)
@@ -372,7 +372,7 @@ void shipMove(short array[][10], const short length, const short shipSize, short
 								array[x + i - 1][y] = 2;
 								flag = false;
 							}
-							else 
+							else
 								swap(array[x + i][y], array[x - 1 + i][y]);
 						}
 						else if (array[x + i][y] == 2) {
@@ -549,7 +549,7 @@ void shipMove(short array[][10], const short length, const short shipSize, short
 			break;
 		case arrowRight:
 			if (y + shipSize - 1 < length - 1 && !turned) {
- 				for (short i = 0; i < shipSize; i++) {
+				for (short i = 0; i < shipSize; i++) {
 					if (array[x][y + shipSize - (i + 1)] == 3) {
 						if (array[x][y + 1 + shipSize - (i + 1)] == 1) {
 							array[x][y + shipSize - (i + 1)] = 0;
@@ -676,8 +676,7 @@ void playerInstruction(short array[][10], const short length, const short automa
 }
 
 void randomArrange(short array[][10], const short length) {
-	
-	srand(time(NULL));
+
 	short singleCount{ 4 },
 		twoCount{ 3 },
 		threeCount{ 2 },
@@ -798,10 +797,10 @@ void randomArrange(short array[][10], const short length) {
 		default:
 			break;
 		}
-		
+
 
 	} while (shipsCount > 0);
-	
+
 }
 
 void makeShip(short array[][10], const short shipSize, short x, short y, const short turned) {
@@ -924,8 +923,11 @@ short checkNear(short array[][10], const short shipSize, const bool turned, shor
 
 void startGame(short array[][10], short enemy[][10], const short length) {
 	bool flag = true;
+	short key;
 	while (flag) {
+		system("cls");
 		cout << endl;
+		cout << "\t\tYOUR FIELD\t\t\t\t\t\tENEMY FIELD\n\n";
 		cout << boldVertical;
 		for (short i = 0; i < length * 4; i++) {
 			cout << boldTopHorizontal;
@@ -993,6 +995,28 @@ void startGame(short array[][10], short enemy[][10], const short length) {
 				cout << setw(41) << boldVertical << endl;
 
 		}
-	system("pause");
+		short x{ 4 }, y{ 4 },
+			temp{};
+		enemy[x][y] = 4;
+		key = _getch();
+		switch (_getch())
+		{
+		case arrowUp:
+			//if (x > 0) {
+			//	temp = enemy[x - 1][y];
+			//	
+			//}
+			//x--;
+			break;
+		case arrowDown:
+			break;
+		case arrowLeft:
+			break;
+		case arrowRight:
+			break;
+		default:
+			break;
+		}
+		
 	}
 }
