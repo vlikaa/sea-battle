@@ -63,13 +63,15 @@ void printGameBox(const short array[][10], const short);
 
 void shipMove(short array[][10], const short, const short, short, short);
 
-void fillField(short array[][10], const short);
+void playerInstruction(short array[][10], const short);
 
-void makeShip(short array[][10], const short, short, short);
+void makeShip(short array[][10], const short, short, short, const short turned = 0);
 
 short checkNear(short array[][10], const short, const bool, short, short);
 
 void mainInstruction(short array[][10], const short);
+
+void enemyInstruction(short array[][10], const short);
 
 void paint(const int, const int);
 
@@ -77,12 +79,15 @@ int main()
 {
 
 	const short length{ 10 };
-	short gameBox[length][length]{};
+	short player[length][length]{};
+	short enemy[length][length]{};
 
 
 	////HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
-	mainInstruction(gameBox, length);
+	//mainInstruction(player, length);
+	enemyInstruction(enemy, length);
+	printGameBox(enemy, length);
 
 
 }
@@ -182,7 +187,7 @@ void mainInstruction(short array[][10], const short length) {
 		switch (select - 1)
 		{
 		case start:
-			fillField(array, length);
+			playerInstruction(array, length);
 			break;
 		case load:
 			break;
@@ -557,7 +562,7 @@ void shipMove(short array[][10], const short length, const short shipSize, short
 	}
 }
 
-void fillField(short array[][10], const short length) {
+void playerInstruction(short array[][10], const short length) {
 
 	short xSpawn{ 4 },
 		ySpawn{ 4 };
@@ -613,10 +618,76 @@ void fillField(short array[][10], const short length) {
 	}
 }
 
-void makeShip(short array[][10], const short shipSize, short x, short y) {
+void enemyInstruction(short array[][10], const short length) {
+	
+	srand(time(NULL));
+	short singleCount{ 4 },
+		twoCount{ 3 },
+		threeCount{ 2 },
+		fourCount{ 1 },
+		shipsCount,
+		randShip,
+		randX,
+		randY,
+		turned;
+	do
+	{
+		shipsCount = singleCount + twoCount;
+		randShip = rand() % 4 + 49;
+		randX = rand() % 10 + 1;
+		randY = rand() % 10 + 1;
+		turned = rand() % 2;
+
+		switch (randShip)
+		{
+		case singleDeck:
+			if (singleCount < 1)
+				continue;
+			else if (checkNear(array, 1, false, randX, randY))
+				continue;
+			else {
+				array[randX][randY] = 1;
+				singleCount--;
+			}
+			break;
+		case twoDeck:
+			if (turned) {
+				if (twoCount < 1)
+					continue;
+				else if (randX + 1 > 9)
+					continue;
+				else if (checkNear(array, 2, true, randX, randY))
+					continue;
+				else {
+					makeShip(array, 2, randX, randY, 1);
+					twoCount--;
+				}
+			}
+			break;
+		case threeDeck:
+			break;
+		case fourDeck:
+			break;
+		default:
+			break;
+		}
+		
+
+	} while (shipsCount > 0);
+	
+}
+
+void makeShip(short array[][10], const short shipSize, short x, short y, const short turned) {
 	for (int i = 0; i < shipSize; i++) {
-		array[x][y] = 1;
-		y++;
+		if (turned) {
+			array[x][y] = 1;
+			x++;
+		}
+
+		else {
+			array[x][y] = 1;
+			y++;
+		}
 	}
 }
 
