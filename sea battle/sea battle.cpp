@@ -1039,7 +1039,7 @@ void startGame(short array[][10], short enemy[][10], const short length) {
 	bool flag = true;
 	short x{ 4 }, y{ 4 },
 		temp{}, key,
-		playerShips{ 10 }, enemyShips{ 10 };
+		playerShips{ 10 }, enemyShips{ 4 };
 
 	while (playerShips > 0 && enemyShips > 0) {
 		printGameField(array, enemy, length, x, y);
