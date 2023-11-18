@@ -81,19 +81,21 @@ short checkNear(short array[][10], const short, const bool, short, short);
 
 void mainInstruction(short array[][10], const short);
 
-void randomArrange(short array[][10], const short, const short showAnimation = false);
+short* randomArrange(short array[][10], const short, const short showAnimation = false);
 
 void paint(const int, const int);
 
-void startGame(short array[][10], short enemy[][10], const short);
+void startGame(short array[][10], short enemy[][10], short*, const short);
 
 void cellInstruction(short field[][10], short, short, short*);
 
 void printNear(short field[][10], const short, short, short, const bool turned = false);
 
-bool isDestroyed(const short field[][10], const short, const short, const short, const bool turned = false);
+bool isDestroyed(short field[][10], const short shipSize, short x, short y, const bool turned);
 
-short findSize(short field[][10], const short, const short, const short);
+short findSize(short field[][10], const bool, short, short);
+
+void findStartCoordination(const short field[][10], const short, short*, short*);
 
 int main()
 {
@@ -280,13 +282,6 @@ void printGameField(const short array[][10], const short enemy[][10], const shor
 					paint(black, gray);
 				cout << "()";
 			}
-			else if (enemy[i][j] == 1) {
-				if (i == x && j == y)
-					paint(red, white);
-				else
-					paint(white, white);
-				cout << boldVertical << boldVertical;
-			}
 			else 
 				cout << "  ";
 			paint(black, white);
@@ -310,6 +305,8 @@ void mainInstruction(short array[][10], const short length) {
 	bool flag = true;
 	int select;
 	short enemy[10][10]{};
+	short* enemyCord;
+	short* playerCord;
 
 	while (flag) {
 		select = showMenu();
@@ -322,8 +319,8 @@ void mainInstruction(short array[][10], const short length) {
 				randomArrange(array, length, false);
 			else if (select == 2)
 				playerInstruction(array, length);
-			randomArrange(enemy, length);
-			startGame(array, enemy, length);
+			enemyCord = randomArrange(enemy, length);
+			startGame(array, enemy, enemyCord, length);
 			break;
 		case load:
 			break;
@@ -758,21 +755,18 @@ void playerInstruction(short array[][10], const short length, const short automa
 	}
 }
 
-void randomArrange(short array[][10], const short length, const short showAnimation) {
+short* randomArrange(short array[][10], const short length, const short showAnimation) {
+	short coordinates[12]{};
 	short singleCount{ 4 },
 		twoCount{ 3 },
 		threeCount{ 2 },
-		fourCount{},
+		fourCount{ 1 },
 		shipsCount,
 		randShip,
 		randX,
 		randY,
 		turned,
-		i{};
-	array[1][1] = 1;
-	array[1][2] = 1;
-	array[1][3] = 1;
-	array[1][4] = 1;
+		i{}, j{};
 	const char animationFrames[] = { '|', '/', '-', '\\' };
 	do
 	{
@@ -816,6 +810,8 @@ void randomArrange(short array[][10], const short length, const short showAnimat
 						else {
 							makeShip(array, 2, randX, randY, 1);
 							twoCount--;
+							coordinates[j++] = randX;
+							coordinates[j++] = randY;
 						}
 					}
 				}
@@ -828,6 +824,8 @@ void randomArrange(short array[][10], const short length, const short showAnimat
 						else {
 							makeShip(array, 2, randX, randY);
 							twoCount--;
+							coordinates[j++] = randX;
+							coordinates[j++] = randY;
 						}
 					}
 				}
@@ -844,6 +842,8 @@ void randomArrange(short array[][10], const short length, const short showAnimat
 						else {
 							makeShip(array, 3, randX, randY, 1);
 							threeCount--;
+							coordinates[j++] = randX;
+							coordinates[j++] = randY;
 						}
 					}
 				}
@@ -856,6 +856,8 @@ void randomArrange(short array[][10], const short length, const short showAnimat
 						else {
 							makeShip(array, 3, randX, randY);
 							threeCount--;
+							coordinates[j++] = randX;
+							coordinates[j++] = randY;
 						}
 					}
 				}
@@ -873,6 +875,8 @@ void randomArrange(short array[][10], const short length, const short showAnimat
 						else {
 							makeShip(array, 4, randX, randY, 1);
 							fourCount--;
+							coordinates[j++] = randX;
+							coordinates[j++] = randY;
 						}
 					}
 				}
@@ -885,6 +889,8 @@ void randomArrange(short array[][10], const short length, const short showAnimat
 						else {
 							makeShip(array, 4, randX, randY);
 							fourCount--;
+							coordinates[j++] = randX;
+							coordinates[j++] = randY;
 						}
 					}
 				}
@@ -894,10 +900,14 @@ void randomArrange(short array[][10], const short length, const short showAnimat
 		default:
 			break;
 		}
-			
+
+
 
 	} while (shipsCount > 0);
-
+	for (short i = 0; i < 12; i++) {
+		cout << coordinates[i++] << ' ' << coordinates[i] << endl;
+	}
+	return coordinates;
 }
 
 void makeShip(short array[][10], const short shipSize, short x, short y, const short turned) {
@@ -921,7 +931,7 @@ short checkNear(short array[][10], const short shipSize, const bool turned, shor
 		nearLength = 9;
 		center = 5;
 		for (short i = 0, j = 0, step = 1; step <= nearLength; step++, j++) {
-			if (step != center && array[x - 1 + i][y - 1 + j] > 0 && array[x - 1 + i][y - 1 + j] < 5) {
+			if (step != center) {
 				if (x - 1 + i < 0) {
 					i++;
 					j = -1;
@@ -939,7 +949,8 @@ short checkNear(short array[][10], const short shipSize, const bool turned, shor
 					i++;
 					continue;
 				}
-				return step;
+				if (array[x - 1 + i][y - 1 + j] == 1 || array[x - 1 + i][y - 1 + j] == 4)
+					return step;
 			}
 			if (step % 3 == 0) {
 				j = -1;
@@ -1035,11 +1046,11 @@ short checkNear(short array[][10], const short shipSize, const bool turned, shor
 
 }
 
-void startGame(short array[][10], short enemy[][10], const short length) {
+void startGame(short array[][10], short enemy[][10], short* enemyCord, const short length) {
 	bool flag = true;
 	short x{ 4 }, y{ 4 },
 		temp{}, key,
-		playerShips{ 10 }, enemyShips{ 4 };
+		playerShips{ 10 }, enemyShips{ 10 };
 
 	while (playerShips > 0 && enemyShips > 0) {
 		printGameField(array, enemy, length, x, y);
@@ -1076,37 +1087,27 @@ void startGame(short array[][10], short enemy[][10], const short length) {
 }
 
 void cellInstruction(short field[][10], short x, short y, short* shipsCount) {
-	short direction;
+	short direction,
+		shipSize;
+	bool turned;
 	if (field[x][y] == 1) {
 		field[x][y] = 4;
 		direction = checkNear(field, 1, false, x, y);
+
+		(direction == 2 || direction == 8) && direction != 0 ? turned = true : turned = false;
+
 		if (direction == 0) {
 			printNear(field, 1, x, y);
 			*shipsCount -= 1;
 		}
 		else {
-			for (short i = 0; i < 4; i++) {
-				if (direction == 2) {
-
-				}
-				else if (direction == 4) {
-					findSize(field, direction, x, y);
-					if (checkNear(field, 1, false, x, y - 1) == 4) {
-						if (checkNear(field, 1, false, x, y - 2) == 4) {
-							if (isDestroyed(field, 4, x, y - 3)) {
-								printNear(field, 4, x, y - 3);
-								*shipsCount -= 1;
-							}
-						}
-					}
-				}
-				else if (direction == 6) {
-
-				}
-				else if (direction == 8) {
-
-				}
+			findStartCoordination(field, direction, &x, &y);
+			shipSize = findSize(field, turned, x, y);
+			if (isDestroyed(field, shipSize, x, y, turned)) {
+				printNear(field, shipSize, x, y, turned);
+				*shipsCount -= 1;
 			}
+
 		}
 	}
 	else if (field[x][y] != 4) {
@@ -1152,66 +1153,213 @@ void printNear(short field[][10], const short shipSize, short x, short y, const 
 
 		}
 	}
-	if (turned);
-	else {
-		nearLength = (2 + shipSize) * 2;
-		center = 1;
-		for (short i = 0, j = 0, step = 1; step <= nearLength; step++) {
-			if (i == center && step > 0 && step < shipSize + 1) {
-				if (x - 1 + i < 0) {
-					i++;
-					j = -1;
-					step += 5;
-					continue;
+	else if (turned) {
+		for (short i = 0; i < shipSize; i++) {
+			if (i == 0) {
+				nearLength = 6;
+				center = 5;
+				for (short i = 0, j = 0, step = 1; step <= nearLength; step++, j++) {
+					if (step != center) {
+						if (x - 1 + i < 0) {
+							i++;
+							j = -1;
+							step += 2;
+							continue;
+						}
+						else if (x - 1 + i > 9) {
+							break;
+						}
+						else if (y - 1 + j < 0) {
+							continue;
+						}
+						else if (y - 1 + j > 9) {
+							j = -1;
+							i++;
+							continue;
+						}
+						
+						field[x - 1 + i][y - 1 + j] = 5;
+					}
+					if (step % 3 == 0) {
+						j = -1;
+						i++;
+					}
 				}
-				else if (x - 1 + i > 9) {
-					break;
-				}
-				else if (y - 1 + j < 0) {
-					continue;
-				}
-				else if (y - 1 + j > 9) {
-					j = -1;
-					i++;
-					continue;
-				}
-				field[x - 1 + i][y - 1 + j] = 5;
 			}
-			if (step % (2 + shipSize) == 0) {
-				j = -1;
-				i++;
+			else if (i + 1 == shipSize) {
+				nearLength = 6;
+				center = 2;
+				for (short i = 0, j = 0, step = 1; step <= nearLength; step++, j++) {
+					if (step != center) {
+						if (x + (shipSize - 1) - 1 + i < 0) {
+							i++;
+							j = -1;
+							step += 2;
+							continue;
+						}
+						else if (x + (shipSize - 1) - 1 + i > 9) {
+							break;
+						}
+						else if (y - 1 + j < 0) {
+							continue;
+						}
+						else if (y - 1 + j > 9) {
+							j = -1;
+							i++;
+							continue;
+						}
+						field[x + (shipSize - 1) + i][y - 1 + j] = 5;
+					}
+					if (step % 3 == 0) {
+						j = -1;
+						i++;
+					}
+				}
 			}
-			j++;
+			else {
+				if (y - 1 < 0)
+					field[x + i][y + 1] = 5;
+				else if (y + 1 > 9)
+					field[x + i][y - 1] = 5;
+				else {
+					field[x + i][y + 1] = 5;
+					field[x + i][y - 1] = 5;
+
+				}
+			}
 		}
-			
+	}
+	else {
+		for (short i = 0; i < shipSize; i++) {
+			if (i == 0) {
+				nearLength = 6;
+				center = 4;
+				for (short i = 0, j = 0, step = 1; step <= nearLength; step++, j++) {
+					if (step != center) {
+						if (x - 1 + i < 0) {
+							i++;
+							j = -1;
+							step++;
+							continue;
+						}
+						else if (x - 1 + i > 9)
+							break;
+						else if (y - 1 + j < 0) 
+							continue;
+						else if (y - 1 + j > 9) {
+							j = -1;
+							i++;
+							continue;
+						}
+						field[x - 1 + i][y - 1 + j] = 5;
+					}
+					if (step % 2 == 0) {
+						j = -1;
+						i++;
+					}
+				}
+			}
+			else if (i + 1 == shipSize) {
+				nearLength = 6;
+				center = 3;
+				for (short i = 0, j = 0, step = 1; step <= nearLength; step++, j++) {
+					if (step != center) {
+						if (x - 1 + i < 0) {
+							i++;
+							j = -1;
+							step++;
+							continue;
+						}
+						else if (x - 1 + i > 9)
+							break;
+						else if (y + (shipSize - 1) + j < 0)
+							continue;
+						else if (y + (shipSize - 1) + j > 9) {
+							j = -1;
+							i++;
+							continue;
+						}
+						field[x - 1 + i][y + (shipSize - 1) + j] = 5;
+					}
+					if (step % 2 == 0) {
+						j = -1;
+						i++;
+					}
+				}
+			}
+			else {
+				if (x - 1 < 0)
+					field[x + 1][y + i] = 5;
+				else if (x + 1 > 9)
+					field[x - 1][y + i] = 5;
+				else {
+					field[x + 1][y + i] = 5;
+					field[x - 1][y + i] = 5;
+				}
+			}
+		}			
 	}
 }
 
-bool isDestroyed(const short field[][10], const short shipSize, const short x, const short y, const bool turned) {
-	for (short i = 0; i < shipSize; i++) {
-		if (turned) {
-			if (field[x + i][y] != 4)
+bool isDestroyed(short field[][10], const short shipSize, short x, short y, const bool turned) {
+
+	if (turned) {
+		for (short j = 0; j < shipSize; j++) {
+				if (field[x + j][y] != 4)
+					return false;
+		}
+		return true;
+	}
+	else {
+		for (short j = 0; j < shipSize; j++) {
+			if (field[x][y + j] != 4)
 				return false;
+		}
+		return true;
+	}
+}
+
+short findSize(short field[][10], const bool turned, short x, short y) {
+	short shipSize{ 1 };
+
+	for (short i = 0; i < 4; i++) {
+		if (turned) {
+			if (field[x + 1][y] == 1 || field[x + 1][y] == 4) {
+				shipSize++;
+				x++;
+			}
+			else
+				return shipSize;
 		}
 		else {
-			if (field[x][y + i] != 4)
-				return false;
+			if (field[x][y + 1] == 1 || field[x][y + 1] == 4) {
+				shipSize++;
+				y++;
+			}
+			else
+				return shipSize;
 		}
 	}
-	return true;
+
+	
 }
 
-short findSize(short field[][10], const short direction, const short x, const short y) {
-	short shipSize{},
-		temp;
-	for (short i = 0; i < 4; i++) {
-		if (checkNear(field, 1, false, x, y - 1) != 4) {
-			break;
+void findStartCoordination(const short field[][10], const short direction, short* x, short* y) {
+	if (direction == 2) {
+		for (short i = 0; i < 4; i++) {
+			if ((field[*x - 1][*y] == 1 || field[*x - 1][*y] == 4) && *x > 0) {
+				*x -= 1;
+			}
 		}
 	}
-	return shipSize;
+	else if (direction == 4) {
+		for (short i = 0; i < 4; i++) {
+			if ((field[*x][*y - 1] == 1 || field[*x][*y - 1] == 4) && *y > 0) {
+				*y -= 1;
+			}
+		}
+	}
 }
-
 
 
 
