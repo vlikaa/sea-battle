@@ -7,6 +7,14 @@ enum difficulty
 
 };
 
+enum direction
+{
+	upCell,
+	downCell,
+	leftCell,
+	rightCell
+};
+
 enum Frame : char
 {
 	leftTopCorner = char(201),

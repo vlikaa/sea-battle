@@ -1,5 +1,10 @@
 
 #include <iostream>
+#include "prototypes.h"
+
+using namespace std;
+
+
 
 int showMenu() {
 	int key = 1;
@@ -41,6 +46,105 @@ int showMenu() {
 
 	}
 
+}
+
+void showPreview(const short seconds) {
+	char key{};
+	thread thread(key_return, ref(key));
+	const char* sea{
+		"\n\t   _____    ______       ___         \n"
+		"\t  /  ___|  |  ____|     /   \\        \n"
+		"\t |  (__    | |__       /  _  \\       \n"
+		"\t  \\___ \\   |  __|     / /___\\ \\    \n"
+		"\t  ____) |  | |____   /  _____  \\     \n"
+		"\t |_____/   |______| /__/     \\__\\   \n" };
+
+	const char* battle{
+		"\t\t         ______         ___       ________    ________    _          ______    \n "
+		"\t\t        |  __  \\       /   \\     |__    __|  |__    __|  | |        |  ____| \n	"
+		"\t\t| |__) /      /  _  \\       |  |        |  |     | |        | |__             \n "
+		"\t\t        |  ___ \\     / /___\\ \\      |  |        |  |     | |        |  __|   \n "
+		"\t\t        | |__/  |   /  _____  \\     |  |        |  |     | |____    | |____   \n "
+		"\t\t        |______/   /__/     \\__\\    |__|        |__|     |______|   |______| \n" };
+	short color = 1, i{};
+	while (i++ < seconds) {
+		if (key != 0)
+		{
+			thread.detach();
+			break;
+		}
+		system("cls");
+		if (color == 1) {
+			system("color  01");
+			color = 4;
+		}
+		else {
+			system("color  04");
+			color = 1;
+		}
+		cout << sea << endl << battle;
+		Sleep(500);
+	}
+}
+
+void showAnimation() {
+	system("cls");
+	const char* firstShip{
+
+	"\t\t\t\t\t               |\\               \n"
+	"\t\t\t\t\t               |/\\              \n"
+	"\t\t\t\t\t               |//\\             \n"
+	"\t\t\t\t\t              /|/ /\\            \n"
+	"\t\t\t\t\t           __/ | ` `\\___        \n"
+	"\t\t\t\t\t          \\------------ /       \n"
+	"\t\t\t\t\t   ~~~  ~~~~~~~ ~~ ~~~~~~~~~~ ~~~\n"
+
+	};
+	const char* secondShip{
+
+		"\t\t\t\t\t        ^      /|        ^    \n"
+		"\t\t\t\t\t              //|\\           \n"
+		"\t\t\t\t\t     `       ///|\\\\      ^  \n"
+		"\t\t\t\t\t    ^       ////|\\\\\\       \n"
+		"\t\t\t\t\t           /////| --->        \n"
+		"\t\t\t\t\t        \\--------------/     \n"
+		"\t\t\t\t\t  ~~~~~~~  ~~~~~~~~~~~~  ~~~~ \n"
+
+	};
+	const char* thirdShip{
+
+		"\t\t\t\t\t               |       |                       \n"
+		"\t\t\t\t\t              )_)     )_)     |                \n"
+		"\t\t\t\t\t             )___)   )___)   )_)             \n"
+		"\t\t\t\t\t            )_____) )_____) )___)\\          \n"
+		"\t\t\t\t\t          _____|_______|______|___\\__     \n"
+		"\t\t\t\t\t          \\                      /         ~~  \n"
+		"\t\t\t\t\t  ~~~~~~ ~~~~~  ~~~~~~~~~~~~~~~ ~~~~~ ~~ ~~    \n"
+
+	};
+	const char* ships[3]{ firstShip, secondShip,thirdShip };
+	for (short i = 0; i < 50; i++){
+		system("cls");
+		loading(i);
+		cout << "\n\n\n\n\n\n\n"
+			<< ships[rand() % 3];
+		Sleep(100);
+	}
+	paint(black, white);
+}
+
+void loading(const short index) {
+	paint(black, rand() % 15 + 1);
+	cout << "\n\n\t\t\t\t[";
+	for (int i = 0; i < 49; i++)
+	{
+		if (i == 49 / 2)
+			cout << index;
+		if (i < index)
+			cout << char(254);
+		else cout << ' ';
+	}
+	cout << "]\n";
 }
 
 int showMethodChoise(const short array[][10], const short length) {
@@ -200,22 +304,22 @@ void mainInstruction(short array[][10], const short length) {
 	bool flag = true;
 	int select;
 	short enemy[10][10]{};
-	short* enemyCord;
-	short* playerCord;
 
 	while (flag) {
+		showPreview(6);
 		select = showMenu();
 		switch (select - 1)
 		{
 		case start:
+			showAnimation();
 			system("cls");
 			select = showMethodChoise(array, length);
 			if (select == 1)
-				randomArrange(array, length, false);
+				randomArrange(array, length, true);
 			else if (select == 2)
 				playerInstruction(array, length);
-			enemyCord = randomArrange(enemy, length);
-			startGame(array, enemy, enemyCord, length);
+			randomArrange(enemy, length);
+			startGame(array, enemy, length);
 			break;
 		case load:
 			break;
@@ -650,7 +754,7 @@ void playerInstruction(short array[][10], const short length, const short automa
 	}
 }
 
-short* randomArrange(short array[][10], const short length, const short showAnimation) {
+void randomArrange(short array[][10], const short length, short showAnimation) {
 	short coordinates[12]{};
 	short singleCount{ 4 },
 		twoCount{ 3 },
@@ -663,9 +767,18 @@ short* randomArrange(short array[][10], const short length, const short showAnim
 		turned,
 		i{}, j{};
 	const char animationFrames[] = { '|', '/', '-', '\\' };
+	//char key{};
+	//thread thread(key_return, ref(key));
 	do
 	{
 		if (showAnimation) {
+
+			//if (key != 0)
+			//{
+			//	thread.detach();
+			//	showAnimation = false;
+			//}
+
 			system("cls");
 			printPlayerField(array, length);
 			cout << "\n\n\tLoading " << animationFrames[i] << endl;
@@ -705,8 +818,6 @@ short* randomArrange(short array[][10], const short length, const short showAnim
 						else {
 							makeShip(array, 2, randX, randY, 1);
 							twoCount--;
-							coordinates[j++] = randX;
-							coordinates[j++] = randY;
 						}
 					}
 				}
@@ -719,8 +830,6 @@ short* randomArrange(short array[][10], const short length, const short showAnim
 						else {
 							makeShip(array, 2, randX, randY);
 							twoCount--;
-							coordinates[j++] = randX;
-							coordinates[j++] = randY;
 						}
 					}
 				}
@@ -737,8 +846,6 @@ short* randomArrange(short array[][10], const short length, const short showAnim
 						else {
 							makeShip(array, 3, randX, randY, 1);
 							threeCount--;
-							coordinates[j++] = randX;
-							coordinates[j++] = randY;
 						}
 					}
 				}
@@ -751,8 +858,6 @@ short* randomArrange(short array[][10], const short length, const short showAnim
 						else {
 							makeShip(array, 3, randX, randY);
 							threeCount--;
-							coordinates[j++] = randX;
-							coordinates[j++] = randY;
 						}
 					}
 				}
@@ -770,8 +875,6 @@ short* randomArrange(short array[][10], const short length, const short showAnim
 						else {
 							makeShip(array, 4, randX, randY, 1);
 							fourCount--;
-							coordinates[j++] = randX;
-							coordinates[j++] = randY;
 						}
 					}
 				}
@@ -784,8 +887,6 @@ short* randomArrange(short array[][10], const short length, const short showAnim
 						else {
 							makeShip(array, 4, randX, randY);
 							fourCount--;
-							coordinates[j++] = randX;
-							coordinates[j++] = randY;
 						}
 					}
 				}
@@ -799,10 +900,6 @@ short* randomArrange(short array[][10], const short length, const short showAnim
 
 
 	} while (shipsCount > 0);
-	for (short i = 0; i < 12; i++) {
-		cout << coordinates[i++] << ' ' << coordinates[i] << endl;
-	}
-	return coordinates;
 }
 
 void makeShip(short array[][10], const short shipSize, short x, short y, const short turned) {
@@ -941,18 +1038,30 @@ short checkNear(short array[][10], const short shipSize, const bool turned, shor
 
 }
 
-void startGame(short array[][10], short enemy[][10], short* enemyCord, const short length) {
+void  key_return(char& key) {
+
+	char tmp{};
+	while (tmp == 0) {
+		tmp = _getch();
+	}
+	key = tmp;
+
+}
+
+void startGame(short array[][10], short enemy[][10], const short length) {
 	bool flag = true;
 	short x{ 4 }, y{ 4 },
 		temp{}, key,
-		playerShips{ 10 }, enemyShips{ 10 };
+		playerShips{ 10 }, enemyShips{ 10 },
+		directions[4]{ 2, 4, 6, 8 }, dLength{ 4 },
+		hitX{ -1 }, hitY{ -1 };
 
 	while (playerShips > 0 && enemyShips > 0) {
 		printGameField(array, enemy, length, x, y);
 		key = _getch();
 		if (key == 13) {
 			if (!cellInstruction(enemy, x, y, &enemyShips))
-				enemyInstruction(array, 0, &playerShips);
+				enemyInstruction(array, directions, &dLength, 0, &playerShips, &hitX, &hitY);
 			continue;
 		}
 		switch (_getch())
@@ -1012,29 +1121,55 @@ bool cellInstruction(short field[][10], short x, short y, short* shipsCount) {
 	}
 }
 
-void enemyInstruction(short field[][10], const short difficulty, short* playerShips) {
+void enemyInstruction(short field[][10], short* direction, short* length, const short difficulty, short* playerShips, short* hitX, short* hitY) {
 	short randX, randY,
 		tempX, tempY,
-		shipSize;
+		shipSize,
+		randIndex;
 	bool flag = true;
 	if (difficulty == soEasy) {
 		randX = rand() % 10;
 		randY = rand() % 10;
-		if (cellInstruction(field, randX, randY, playerShips))
-			enemyInstruction(field, 0, playerShips);
+		if (cellInstruction(field, randX, randY, playerShips)){}
+			enemyInstruction(field,0, 0, 0, playerShips, 0, 0);
 	}
 	else if (difficulty == easy) {
-		if (flag) {
+		if (*hitX == -1 && *hitY == -1) {
 			randX = rand() % 10;
 			randY = rand() % 10;
 		}
+		else {
+			while (flag)
+			{
+
+				randIndex = rand() % *length;
+				switch (0)
+				{
+				case upCell:
+					if (field[*hitX - 1][*hitY] == 4 || field[*hitX - 1][*hitY] == 5) {
+						swap(direction[randIndex], direction[*length]);
+						*length--;
+						continue;
+					}
+					randX = *hitX - 1;
+					randY = *hitY;
+					flag = false;
+					break;
+				case downCell:
+					break;
+				case leftCell:
+					break;
+				case rightCell:
+					break;
+				default:
+					break;
+				}
+			}
+
+		}
 		if (cellInstruction(field, randX, randY, playerShips)) {
-			flag = false;
-			//shipSize = findSize()
-			//if (isDestroyed(field, 1, randX, randY, false))
-			tempX = randX;
-			tempY = randY;
-			enemyInstruction(field, 1, playerShips);
+			*hitX = randX;
+			*hitY = randY;
 		}
 	}
 
