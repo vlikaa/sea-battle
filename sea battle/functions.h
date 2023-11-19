@@ -245,7 +245,7 @@ void printGameField(const short array[][10], const short enemy[][10], const shor
 		cout << ' ' << char(65 + i) << ' ' << vertical;
 		for (int j = 0; j < length; j++) {
 			if (array[i][j] == 4) {
-				paint(black, red);
+				paint(gray, red);
 				cout << "><";
 			}
 			else if (array[i][j] == 5) {
@@ -315,7 +315,7 @@ void mainInstruction(short array[][10], const short length) {
 			system("cls");
 			select = showMethodChoise(array, length);
 			if (select == 1)
-				randomArrange(array, length, true);
+				randomArrange(array, length, false);
 			else if (select == 2)
 				playerInstruction(array, length);
 			randomArrange(enemy, length);
@@ -1060,8 +1060,9 @@ void startGame(short array[][10], short enemy[][10], const short length) {
 		printGameField(array, enemy, length, x, y);
 		key = _getch();
 		if (key == 13) {
-			if (!cellInstruction(enemy, x, y, &enemyShips))
-				enemyInstruction(array, directions, &dLength, 0, &playerShips, &hitX, &hitY);
+			if (!cellInstruction(enemy, x, y, &enemyShips)) {
+				enemyInstruction(array, 0, &playerShips);
+			}
 			continue;
 		}
 		switch (_getch())
@@ -1121,7 +1122,7 @@ bool cellInstruction(short field[][10], short x, short y, short* shipsCount) {
 	}
 }
 
-void enemyInstruction(short field[][10], short* direction, short* length, const short difficulty, short* playerShips, short* hitX, short* hitY) {
+void enemyInstruction(short field[][10], const short difficulty, short* playerShips) {
 	short randX, randY,
 		tempX, tempY,
 		shipSize,
@@ -1130,10 +1131,10 @@ void enemyInstruction(short field[][10], short* direction, short* length, const 
 	if (difficulty == soEasy) {
 		randX = rand() % 10;
 		randY = rand() % 10;
-		if (cellInstruction(field, randX, randY, playerShips)){}
-			enemyInstruction(field,0, 0, 0, playerShips, 0, 0);
+		if (cellInstruction(field, randX, randY, playerShips))
+			enemyInstruction(field, 0, playerShips);
 	}
-	else if (difficulty == easy) {
+	/*else if (difficulty == easy) {
 		if (*hitX == -1 && *hitY == -1) {
 			randX = rand() % 10;
 			randY = rand() % 10;
@@ -1171,7 +1172,7 @@ void enemyInstruction(short field[][10], short* direction, short* length, const 
 			*hitX = randX;
 			*hitY = randY;
 		}
-	}
+	}*/
 
 }
 

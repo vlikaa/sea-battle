@@ -34,7 +34,7 @@ void startGame(short array[][10], short enemy[][10], const short);
 
 bool cellInstruction(short field[][10], short, short, short*);
 
-void enemyInstruction(short field[][10], short*, short*, const short, short*, short*, short*);
+void enemyInstruction(short field[][10],  const short, short*);
 
 void printNear(short field[][10], const short, short, short, const bool turned = false);
 
